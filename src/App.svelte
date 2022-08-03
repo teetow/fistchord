@@ -171,8 +171,9 @@
 <style>
   .verse {
     opacity: 0.5;
+    @apply ease-in-out transition-all duration-150 opacity-50;
   }
   .verse.active {
-    opacity: 1;
+    @apply opacity-100;
   }
 </style>
