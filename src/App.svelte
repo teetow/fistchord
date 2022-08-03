@@ -4,8 +4,11 @@
 
   onMount(() => {
     function keylistener(event) {
+      // i stole this from stackoverflow
       event = event || window.event;
       let key = event.key || event.which || event.key;
+
+      // check the key pressed and whether there is something to scroll
       if ((key == "ArrowDown" || key == "j") && active != elements.length - 1) {
         event.preventDefault();
         scroll("down");
@@ -15,45 +18,46 @@
         scroll("up");
       }
     }
-
+    
     let elements = document.getElementById("doin").children;
+    // this tracks how far along we are in the song.
+    // you would probably want to replace this with a svelte store
     let active = 0;
 
     async function scroll(direction) {
-      if (active < elements.length) {
-        if (direction == "up") {
-          active--;
-          if (elements[active + 1]) {
-            let oldelement = elements[active + 1];
-            oldelement.classList.remove("active");
-          }
-        } else if (direction == "down") {
-          active++;
-          if (elements[active - 1]) {
-            let oldelement = elements[active - 1];
-            oldelement.classList.remove("active");
-          }
+      if (direction == "up") {
+        active--;
+        
+        let oldelement = elements[active + 1];
+        if (oldelement) {
+          oldelement.classList.remove("active");
         }
+      } else if (direction == "down") {
+        active++;
 
-        let element = elements[active];
-
-        element.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-        element.classList.add("active");
+        let oldelement = elements[active - 1];
+        if (oldelement) {
+          oldelement.classList.remove("active");
+        }
       }
+
+      let element = elements[active];
+
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      element.classList.add("active");
     }
 
-    var el = window;
-    el.addEventListener("keydown", keylistener);
+    window.addEventListener("keydown", keylistener);
     scroll();
   });
 </script>
 
 <div
   id="doin"
-  class="flex flex-col gap-4 text-2xl font-normal my-[50%] font-serif"
+  class="flex flex-col gap-4 text-2xl font-normal my-[25%] font-serif"
 >
   <div class="verse active">
     <p>[Intro: Ray William Johnson]</p>
