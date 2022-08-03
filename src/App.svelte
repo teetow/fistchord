@@ -6,13 +6,13 @@
     function keylistener(event) {
       event = event || window.event;
       let key = event.key || event.which || event.key;
-      if (key == "ArrowDown") {
-        event.preventDefault();
-        scroll("up");
-      }
-      if (key == "ArrowUp") {
+      if ((key == "ArrowDown" || key == "j") && active != elements.length - 1) {
         event.preventDefault();
         scroll("down");
+      }
+      if ((key == "ArrowUp" || key == "k") && active != 0) {
+        event.preventDefault();
+        scroll("up");
       }
     }
 
@@ -21,13 +21,13 @@
 
     async function scroll(direction) {
       if (active < elements.length) {
-        if (direction == "down") {
+        if (direction == "up") {
           active--;
           if (elements[active + 1]) {
             let oldelement = elements[active + 1];
             oldelement.classList.remove("active");
           }
-        } else if (direction == "up") {
+        } else if (direction == "down") {
           active++;
           if (elements[active - 1]) {
             let oldelement = elements[active - 1];
