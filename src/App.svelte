@@ -1,19 +1,26 @@
-<script>
+<script lang="ts">
   import "@fontsource/roboto-serif/variable-full.css";
   import { onMount } from "svelte";
-  import { each } from "svelte/internal";
+  import { element } from "svelte/internal";
   import testLyric from "./data/doin-your-mom.txt?raw";
   import parse from "./lib/parse";
+  import Sidebar from "./Sidebar.svelte";
 
   const lyrics = parse(testLyric);
+  const fontSizes = {
+    1: "1em",
+    2: "1.2em",
+    3: "1.5em",
+    4: "2.5em",
+    5: "3.5em",
+  };
+  let fontSize = 1;
 
   const el = ["lyrics", "capo", "chords", "fontsize"];
   let sel = 0;
   let capo = 0;
   let show_chords = true;
   let font = 3;
-  const fz = [1, 1.2, 1.5, 2.5, 3.5];
-  const sz = ["smallest", "small", "normal", "large", "largest"];
 
   function nextSelection() {
     document.getElementById(`${el[sel]}-pointer`).classList.remove("pactive");
@@ -69,18 +76,8 @@
     }
 
     document.getElementById("capo-number").innerText = `${capo}`;
-    document.getElementById("lyrics").style.fontSize = `${fz[font]}em`;
 
-    async function fontchange(dir) {
-      document.getElementById(`font-${sz[font]}`).classList.remove("selected");
-      if (dir == "up") {
-        font = (font + 1) % fz.length;
-      } else {
-        font = (font - 1 + fz.length) % fz.length;
-      }
-      document.getElementById(`font-${sz[font]}`).classList.add("selected");
-      document.getElementById("lyrics").style.fontSize = `${fz[font]}em`;
-    }
+    async function fontchange(dir) {}
 
     async function capochange(dir) {
       if (dir == "up") {
@@ -107,7 +104,7 @@
       }
     }
 
-    let elements = document.getElementById("doin").children;
+    let elements = document.getElementById("lyrics").children;
     // this tracks how far along we are in the song.
     // you would probably want to replace this with a svelte store
     let active = 0;
@@ -130,79 +127,63 @@
       }
 
       let element = elements[active];
-
-      element.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-      element.classList.add("active");
+      if (element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        element.classList.add("active");
+      }
     }
 
     window.addEventListener("keydown", keylistener);
 
-    scroll();
+    scroll("up");
   });
 </script>
 
-<div id="sidebar">
-  <div class="sidebar-header">
-    <div class="pointer sidebar-pointer" id="capo-pointer">▶</div>
-    <div class="sidebar-header-text">CAPO</div>
-  </div>
-  <div id="capo-number">1</div>
-  <div class="sidebar-header">
-    <div class="pointer sidebar-pointer" id="chords-pointer">▶</div>
-    <div class="sidebar-header-text">CHORDS</div>
-  </div>
-  <div class="on-off">
-    <div class="on sidebar-select selected" id="chords-on">ON</div>
-    <div class="off sidebar-select" id="chords-off">OFF</div>
-  </div>
-  <div class="sidebar-header">
-    <div class="pointer sidebar-pointer" id="fontsize-pointer">▶</div>
-    <div class="sidebar-header-text">FONT SIZE</div>
-  </div>
-  <div class="aaaaa">
-    <div class="smallest sidebar-select" id="font-smallest">A</div>
-    <div class="small sidebar-select" id="font-small">A</div>
-    <div class="normal sidebar-select" id="font-normal">A</div>
-    <div class="large sidebar-select selected" id="font-large">A</div>
-    <div class="largest sidebar-select" id="font-largest">A</div>
-  </div>
-</div>
-<div class="pointer pactive" id="lyrics-pointer">▶</div>
-<div id="lyrics">
-  <div class="ignore" height="600px" />
-  <div id="doin">
-    {#each Object.entries(lyrics) as [_, lyric]}
-      <div class="verse">
-        {#if lyric.section !== undefined}
-          <pre class="section">[{lyric.section}]</pre>
-        {/if}
+<Sidebar id="sidebar" tabIndex="0" {fontSize} on:fontsize={(e) => (fontSize = e.detail)} />
 
-        {#if lyric.chords !== undefined}
-          <pre class="chords">{lyric.chords}</pre>
-        {/if}
+<div id="lyrics" tabindex="0" style={`font-size: ${fontSizes[fontSize]}`}>
+  {#each Object.entries(lyrics) as [_, lyric]}
+    {#if lyric.section !== undefined}
+      <p class="section">[{lyric.section}]</p>
+    {/if}
 
-        {#if lyric.lyrics !== undefined}
-          <pre class="lyrics">{lyric.lyrics}</pre>
-        {/if}
-      </div>
-    {/each}
-  </div>
-  <div class="ignore" />
+    {#if lyric.chords !== undefined}
+      <pre class="chords">{lyric.chords}</pre>
+    {/if}
+
+    {#if lyric.lyrics !== undefined}
+      <h3 class="lyrics">{lyric.lyrics}</h3>
+    {/if}
+  {/each}
+  <footer tabindex="0" on:focus={() => document.getElementById("sidebar").focus()} />
 </div>
 
 <style>
+  #lyrics {
+    background-color: rgb(238, 238, 238);
+    padding: 2rem;
+    overflow-y: hidden;
+  }
+
+  #lyrics:focus {
+    content: "▶";
+  }
+
+  #lyrics:not(:focus) {
+    background-color: #0005;
+    opacity: 0.8;
+  }
+
   .section {
     white-space: pre;
   }
 
   .verse {
     opacity: 0.5;
-    @apply ease-in-out transition-all duration-150 opacity-50;
   }
   .verse.active {
-    @apply opacity-100;
   }
 </style>
