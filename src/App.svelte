@@ -1,26 +1,19 @@
 <script lang="ts">
   import "@fontsource/roboto-serif/variable-full.css";
   import { onMount } from "svelte";
-  import { element } from "svelte/internal";
   import testLyric from "./data/doin-your-mom.txt?raw";
   import parse from "./lib/parse";
+  import Lyrics from "./Lyrics.svelte";
   import Sidebar from "./Sidebar.svelte";
 
   const lyrics = parse(testLyric);
-  const fontSizes = {
-    1: "1em",
-    2: "1.2em",
-    3: "1.5em",
-    4: "2.5em",
-    5: "3.5em",
-  };
-  let fontSize = 1;
 
-  const el = ["lyrics", "capo", "chords", "fontsize"];
+  let fontSize = 3;
+
+  const el = ["lyrics", "capo", "chords"];
   let sel = 0;
   let capo = 0;
-  let show_chords = true;
-  let font = 3;
+  let showChords = true;
 
   function nextSelection() {
     document.getElementById(`${el[sel]}-pointer`).classList.remove("pactive");
@@ -38,34 +31,23 @@
       if (key == "ArrowDown" || key == "j") {
         event.preventDefault();
         switch (el[sel]) {
-          case "lyrics":
-            if (active != elements.length - 1) scroll("down");
-            break;
           case "capo":
             capochange("down");
             break;
           case "chords":
             chords();
             break;
-          case "fontsize":
-            fontchange("down");
-            break;
         }
       }
       if (key == "ArrowUp" || key == "k") {
         event.preventDefault();
         switch (el[sel]) {
-          case "lyrics":
-            if (active != 0) scroll("up");
-            break;
+
           case "capo":
             capochange("up");
             break;
           case "chords":
             chords();
-            break;
-          case "fontsize":
-            fontchange("up");
             break;
         }
       }
@@ -76,8 +58,6 @@
     }
 
     document.getElementById("capo-number").innerText = `${capo}`;
-
-    async function fontchange(dir) {}
 
     async function capochange(dir) {
       if (dir == "up") {
@@ -92,15 +72,15 @@
     }
 
     async function chords() {
-      console.log(show_chords);
-      if (show_chords) {
+      console.log(showChords);
+      if (showChords) {
         document.getElementById("chords-on").classList.remove("selected");
         document.getElementById("chords-off").classList.add("selected");
-        show_chords = false;
+        showChords = false;
       } else {
         document.getElementById("chords-off").classList.remove("selected");
         document.getElementById("chords-on").classList.add("selected");
-        show_chords = true;
+        showChords = true;
       }
     }
 
@@ -142,48 +122,15 @@
   });
 </script>
 
-<Sidebar id="sidebar" tabIndex="0" {fontSize} on:fontsize={(e) => (fontSize = e.detail)} />
-
-<div id="lyrics" tabindex="0" style={`font-size: ${fontSizes[fontSize]}`}>
-  {#each Object.entries(lyrics) as [_, lyric]}
-    {#if lyric.section !== undefined}
-      <p class="section">[{lyric.section}]</p>
-    {/if}
-
-    {#if lyric.chords !== undefined}
-      <pre class="chords">{lyric.chords}</pre>
-    {/if}
-
-    {#if lyric.lyrics !== undefined}
-      <h3 class="lyrics">{lyric.lyrics}</h3>
-    {/if}
-  {/each}
-  <footer tabindex="0" on:focus={() => document.getElementById("sidebar").focus()} />
-</div>
+<Sidebar
+  id="sidebar"
+  tabIndex="0"
+  {showChords}
+  on:chords={(e) => (showChords = e.detail)}
+  {fontSize}
+  on:fontsize={(e) => (fontSize = e.detail)}
+/>
+<Lyrics {fontSize} {lyrics} {showChords} />
 
 <style>
-  #lyrics {
-    background-color: rgb(238, 238, 238);
-    padding: 2rem;
-    overflow-y: hidden;
-  }
-
-  #lyrics:focus {
-    content: "▶";
-  }
-
-  #lyrics:not(:focus) {
-    background-color: #0005;
-    opacity: 0.8;
-  }
-
-  .section {
-    white-space: pre;
-  }
-
-  .verse {
-    opacity: 0.5;
-  }
-  .verse.active {
-  }
 </style>

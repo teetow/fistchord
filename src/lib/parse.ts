@@ -10,7 +10,7 @@ type SectionMatch = {
 type Line = {
   chords?: string;
   lyrics?: string;
-  section?: string;
+  title?: string;
 };
 
 type Lyric = {
@@ -28,7 +28,7 @@ const parse = (data: string) => {
       const {
         groups: { title },
       } = sectionRe.exec(line) as unknown as SectionMatch;
-      lines.push({ section: title });
+      lines.push({ title: title });
       continue;
     }
 

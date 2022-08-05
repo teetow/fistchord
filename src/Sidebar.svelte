@@ -48,7 +48,7 @@
         },
       ]}
       value={showChords}
-      on:change={(e) => (showChords = e.detail)}
+      on:change={(e) => dispatch("chords", e.detail)}
     />
   </div>
 
