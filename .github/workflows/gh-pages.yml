@@ -1,28 +1,40 @@
-name: build for gh-pages
+name: GitHub Pages
 
 on:
   push:
-    branches: ["main"]
-
-  workflow_dispatch:
+    branches:
+      - main
+  pull_request:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Node.js environment
+      - name: Setup Node
         uses: actions/setup-node@v3
+        with:
+          node-version: '14'
 
-      - name: Install dependencies
-        run: npm install
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-      - name: Build
-        run: npm run build
+      - run: npm ci
+      - run: npm run build
 
-      - name: GitHub Pages action
+      - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
