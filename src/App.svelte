@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "@fontsource/roboto-serif/variable-full.css";
   import { onMount } from "svelte";
   import testLyric from "./data/doin-your-mom.txt?raw";
   import parse from "./lib/parse";
@@ -42,7 +41,6 @@
       if (key == "ArrowUp" || key == "k") {
         event.preventDefault();
         switch (el[sel]) {
-
           case "capo":
             capochange("up");
             break;

@@ -18,8 +18,5 @@
     "svelte-preprocess": "^4.10.7",
     "typescript": "^4.7.4",
     "vite": "^3.0.0"
-  },
-  "dependencies": {
-    "@fontsource/roboto-serif": "^4.5.6"
   }
 }
