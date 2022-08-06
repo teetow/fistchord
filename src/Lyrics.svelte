@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Section } from "./lib/parse";
+
   const fontSizes = {
     1: "1em",
     2: "1.2em",
@@ -9,12 +11,15 @@
 
   export let fontSize = 3;
   export let showChords = true;
-  export let lyrics = [];
+  export let lyrics: Section[] = [];
   let sectionPtr = 0;
 
   const handleKeydown = (e: KeyboardEvent) => {
     const el = e.target;
     if (el instanceof Element) {
+      if (e.key === "Home") {
+        sectionPtr = 0;
+      }
       if (e.key === "ArrowDown") {
         sectionPtr = (sectionPtr + 1 + lyrics.length) % lyrics.length;
       } else if (e.key === "ArrowUp") {
@@ -41,18 +46,22 @@
   on:keydown={handleKeydown}
 >
   <div class="filler" />
-  {#each Object.entries(lyrics) as [id, lyric]}
+  {#each Object.entries(lyrics) as [id, section]}
     <div class="section" class:active={Number(id) === sectionPtr}>
-      {#if lyric.title !== undefined}
-        <h3 class="title">[{lyric.title}]</h3>
+      {#if section.title !== undefined}
+        <h3 class="title">[{section.title}]</h3>
       {/if}
 
-      {#if showChords && lyric.chords !== undefined}
-        <pre class="chords">{lyric.chords}</pre>
-      {/if}
+      {#if section.lines}
+        {#each Object.entries(section.lines) as [lineId, line]}
+          {#if showChords && line.chords !== undefined}
+            <pre class="chords">{line.chords}</pre>
+          {/if}
 
-      {#if lyric.lyrics !== undefined}
-        <p class="lyrics">{lyric.lyrics}</p>
+          {#if line.lyrics !== undefined}
+            <p class="lyrics">{line.lyrics}</p>
+          {/if}
+        {/each}
       {/if}
     </div>
   {/each}
@@ -67,6 +76,8 @@
     gap: 1em;
     overflow-y: hidden;
     padding: 2rem;
+    scroll-behavior: smooth;
+    transition: font-size 200ms ease-in-out;
   }
 
   #lyrics:focus {
@@ -82,10 +93,6 @@
     height: 50vh;
   }
 
-  .title {
-    white-space: pre;
-  }
-
   .section {
     opacity: 0.5;
   }
@@ -99,11 +106,21 @@
     content: "▶";
     color: red;
     position: absolute;
-    top: 50%;
+    top: calc(50% - 0.2em);
     transform: translate(-1em, 0em);
+  }
+
+  .title {
+    line-height: 2em;
+    margin: 0 0 1em;
+    font-weight: 400;
   }
 
   .chords {
     margin: -0.7em 0 0 0;
+  }
+
+  .lyrics {
+    margin: 0 0 1.2em;
   }
 </style>

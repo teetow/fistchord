@@ -1,6 +1,17 @@
 import { hasChords } from "./chords";
+import { Linereader } from "./linereader";
 
 const sectionRe = /\[(?<title>.+)\]/;
+
+const isSection = (s: string) => sectionRe.test(s);
+
+const getSectionTitle = (s: string) => {
+  const {
+    groups: { title },
+  } = sectionRe.exec(s) as unknown as SectionMatch;
+  return title;
+};
+
 type SectionMatch = {
   groups: {
     title: string;
@@ -10,17 +21,53 @@ type SectionMatch = {
 type Line = {
   chords?: string;
   lyrics?: string;
-  title?: string;
 };
 
-type Lyric = {
-  lines: Line;
+export type Section = {
+  title?: string;
+  lines?: Line[];
 };
 
 const parse = (data: string) => {
-  const rawLines = data.split("\n");
-  const lines: Line[] = [];
+  const rawLines = data
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l !== "");
 
+  const r = new Linereader(rawLines);
+
+  const sections: Section[] = [];
+
+  while (!r.eof) {
+    const section: Section = {};
+
+    if (isSection(r.nextLine)) {
+      section.title = getSectionTitle(r.readLine());
+      if (isSection(r.nextLine)) {
+        sections.push(section);
+        continue;
+      }
+    }
+
+    let stanzaCtr = 0;
+    while (stanzaCtr < 4 && !isSection(r.nextLine) && !r.eof) {
+      const line: Line = {};
+
+      const text = r.readLine();
+
+      if (hasChords(text)) {
+        line.chords = text;
+        line.lyrics = r.readLine();
+      } else {
+        line.lyrics = text;
+      }
+      section.lines = [...(section.lines || []), line];
+      stanzaCtr++;
+    }
+    sections.push(section);
+  }
+
+  /*
   for (let i = 0; i < rawLines.length; i++) {
     const line = rawLines[i];
 
@@ -28,12 +75,12 @@ const parse = (data: string) => {
       const {
         groups: { title },
       } = sectionRe.exec(line) as unknown as SectionMatch;
-      lines.push({ title: title });
+      sections.push({ title: title });
       continue;
     }
 
     if (hasChords(line)) {
-      const lyricLine: Line = { chords: line };
+      const lyricLine: Section = { chords: line };
 
       const nextLine = rawLines[i + 1];
 
@@ -42,10 +89,11 @@ const parse = (data: string) => {
         i += 1;
       }
 
-      lines.push(lyricLine);
+      sections.push(lyricLine);
     }
   }
-  return lines;
+  */
+  return sections;
 };
 
 export default parse;

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import testLyric from "./data/doin-your-mom.txt?raw";
+  import testLyric from "./data/testlyrics2.txt?raw";
   import parse from "./lib/parse";
   import Lyrics from "./Lyrics.svelte";
   import Sidebar from "./Sidebar.svelte";
@@ -33,9 +33,6 @@
           case "capo":
             capochange("down");
             break;
-          case "chords":
-            chords();
-            break;
         }
       }
       if (key == "ArrowUp" || key == "k") {
@@ -43,9 +40,6 @@
         switch (el[sel]) {
           case "capo":
             capochange("up");
-            break;
-          case "chords":
-            chords();
             break;
         }
       }
@@ -69,54 +63,7 @@
       document.getElementById("capo-number").innerText = `${capo}`;
     }
 
-    async function chords() {
-      console.log(showChords);
-      if (showChords) {
-        document.getElementById("chords-on").classList.remove("selected");
-        document.getElementById("chords-off").classList.add("selected");
-        showChords = false;
-      } else {
-        document.getElementById("chords-off").classList.remove("selected");
-        document.getElementById("chords-on").classList.add("selected");
-        showChords = true;
-      }
-    }
-
-    let elements = document.getElementById("lyrics").children;
-    // this tracks how far along we are in the song.
-    // you would probably want to replace this with a svelte store
-    let active = 0;
-
-    async function scroll(direction) {
-      if (direction == "up") {
-        active--;
-
-        let oldelement = elements[active + 1];
-        if (oldelement) {
-          oldelement.classList.remove("active");
-        }
-      } else if (direction == "down") {
-        active++;
-
-        let oldelement = elements[active - 1];
-        if (oldelement) {
-          oldelement.classList.remove("active");
-        }
-      }
-
-      let element = elements[active];
-      if (element) {
-        element.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-        element.classList.add("active");
-      }
-    }
-
     window.addEventListener("keydown", keylistener);
-
-    scroll("up");
   });
 </script>
 
