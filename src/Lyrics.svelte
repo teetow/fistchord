@@ -22,7 +22,9 @@
     if (!container) {
       return;
     }
+
     await tick();
+
     const currentSection = container.querySelector(".active");
 
     if (currentSection) {
@@ -33,7 +35,8 @@
     }
   };
 
-  $: updateScroll(), [fontSize, sectionPtr];
+  $: updateScroll(), [sectionPtr];
+  $: updateScroll(), [fontSize];
 
   const handleKeydown = (e: KeyboardEvent) => {
     const el = e.target;
@@ -130,6 +133,7 @@
 
   .chords {
     margin: -0.7em 0 0 0;
+    font-size: 0.8em;
   }
 
   .lyrics {

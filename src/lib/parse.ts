@@ -29,10 +29,7 @@ export type Section = {
 };
 
 const parse = (data: string) => {
-  const rawLines = data
-    .split("\n")
-    .map((l) => l.trim())
-    .filter((l) => l !== "");
+  const rawLines = data.split("\n").filter((l) => l.trim() !== "");
 
   const r = new Linereader(rawLines);
 
