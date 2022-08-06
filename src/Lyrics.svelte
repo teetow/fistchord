@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { tick } from "svelte";
+
   import type { Section } from "./lib/parse";
 
   const fontSizes = {
@@ -12,7 +14,26 @@
   export let fontSize = 3;
   export let showChords = true;
   export let lyrics: Section[] = [];
+
   let sectionPtr = 0;
+  let container;
+
+  const updateScroll = async () => {
+    if (!container) {
+      return;
+    }
+    await tick();
+    const currentSection = container.querySelector(".active");
+
+    if (currentSection) {
+      currentSection.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  };
+
+  $: updateScroll(), [fontSize, sectionPtr];
 
   const handleKeydown = (e: KeyboardEvent) => {
     const el = e.target;
@@ -25,21 +46,12 @@
       } else if (e.key === "ArrowUp") {
         sectionPtr = (sectionPtr - 1 + lyrics.length) % lyrics.length;
       }
-
-      window.setTimeout(() => {
-        const currentSection = el.querySelector(".active");
-        if (currentSection) {
-          currentSection.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          });
-        }
-      });
     }
   };
 </script>
 
 <div
+  bind:this={container}
   id="lyrics"
   tabindex="0"
   style={`font-size: ${fontSizes[fontSize]}`}

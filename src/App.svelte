@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import testLyric from "./data/testlyrics2.txt?raw";
+  import testLyric from "./data/testlyrics1.txt?raw";
   import parse from "./lib/parse";
   import Lyrics from "./Lyrics.svelte";
   import Sidebar from "./Sidebar.svelte";

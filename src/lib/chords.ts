@@ -7,6 +7,6 @@ export const isChord = (word: string) => {
 };
 
 export const hasChords = (line: string) => {
-  const words = line?.split(" ");
-  return words.length / words.filter((s) => isChord(s)).length < 0.8;
+  const words = line?.split(" ").filter((s) => s.trim() !== "");
+  return words.filter((s) => isChord(s)).length / words.length > 0.8;
 };

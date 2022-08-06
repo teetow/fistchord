@@ -57,7 +57,7 @@ const parse = (data: string) => {
 
       if (hasChords(text)) {
         line.chords = text;
-        line.lyrics = r.readLine();
+        line.lyrics = !hasChords(r.nextLine) && !isSection(r.nextLine) ? r.readLine() : "";
       } else {
         line.lyrics = text;
       }
@@ -67,32 +67,6 @@ const parse = (data: string) => {
     sections.push(section);
   }
 
-  /*
-  for (let i = 0; i < rawLines.length; i++) {
-    const line = rawLines[i];
-
-    if (sectionRe.test(line)) {
-      const {
-        groups: { title },
-      } = sectionRe.exec(line) as unknown as SectionMatch;
-      sections.push({ title: title });
-      continue;
-    }
-
-    if (hasChords(line)) {
-      const lyricLine: Section = { chords: line };
-
-      const nextLine = rawLines[i + 1];
-
-      if (!hasChords(nextLine)) {
-        lyricLine.lyrics = nextLine;
-        i += 1;
-      }
-
-      sections.push(lyricLine);
-    }
-  }
-  */
   return sections;
 };
 
