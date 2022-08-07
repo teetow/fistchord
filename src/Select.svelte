@@ -12,6 +12,7 @@
   export let id: string = "";
   export let options: Option[] = [];
   export let value: string | number | boolean;
+  export let compact = false;
 
   const cycleOptions = (val: string, delta: number) => {
     const currentIndex = options.findIndex((item) => item.value.toString() === val);
@@ -51,7 +52,11 @@
 
 <div {id} class="ui-select" tabindex="0" on:keydown={handleKeydown}>
   {#each options as option (option.id)}
-    <div class="ui-select__option" class:selected={option.value === value}>
+    <div
+      class="ui-select__option"
+      class:selected={option.value === value}
+      class:visible={!compact || option.value === value}
+    >
       <label
         class={["ui-select__label", option.className].join(" ")}
         for={option.id}
@@ -94,6 +99,10 @@
 
   .ui-select__option {
     border: 1px solid transparent;
+  }
+
+  .ui-select__option:not(.visible) {
+    display: none;
   }
 
   .selected {

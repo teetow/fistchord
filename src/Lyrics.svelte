@@ -11,8 +11,9 @@
     4: 1.5,
     5: 2.0,
   };
-  export let fontSize = 3;
+  export let transpose = 0;
   export let showChords = true;
+  export let fontSize = 3;
   export let lyrics: Section[] = [];
 
   const zoomSpeed = 200;
@@ -44,6 +45,9 @@
     ArrowDown: () => (sectionPtr = (sectionPtr + 1 + lyrics.length) % lyrics.length),
     ArrowUp: () => (sectionPtr = (sectionPtr - 1 + lyrics.length) % lyrics.length),
     NumpadPlus: () => dispatch("fontsize", (fontSize + 1) % 5),
+    NumpadMinus: () => dispatch("fontsize", (fontSize - 1) % 5),
+    NumpadDivide: () => dispatch("transpose", transpose - 1),
+    NumpadMultiply: () => dispatch("transpose", transpose + 1),
   };
 
   const handleKeydown = (e: KeyboardEvent) => keyBinds[e.key]?.();
@@ -70,7 +74,7 @@
 
       {#if section.lines}
         {#each section.lines as line}
-          <LyricLine {showChords} {line} />
+          <LyricLine {transpose} {showChords} {line} />
         {/each}
       {/if}
     </div>
@@ -99,7 +103,7 @@
 
   #lyrics:not(:focus) {
     /* background-color: #0003; */
-    opacity: 1.0;
+    opacity: 1;
   }
 
   .filler {

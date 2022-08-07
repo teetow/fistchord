@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { transposeChord } from "./lib/chords";
   import type { Line } from "./lib/parse";
 
+  export let transpose = 0;
   export let line: Line;
   export let showChords = false;
   export let chordStyle: "solid" | "outline" = "outline";
@@ -47,7 +49,6 @@
   const applyChords = (line: string, chords: ChordWithOffset[]): Fragment[] => {
     let lastLyric = "";
     const splits = chords.map((c) => c.offset);
-    console.log(splits, chords);
 
     const out = line.split("").reduce((acc, val, pos) => {
       if (splits.includes(pos) || pos === line.length - 1) {
@@ -66,6 +67,7 @@
       ...chords.filter((c) => c.offset >= line.length).map((c) => ({ chord: c.symbol })),
     ];
   };
+  //data-chord={fragment.chord}
 </script>
 
 <p class="lyrics" class:show-chords={showChords}>
@@ -76,7 +78,7 @@
           class="chord"
           class:solid={chordStyle === "solid"}
           class:outline={chordStyle === "outline"}
-          data-chord={fragment.chord}
+          data-chord={transposeChord(fragment.chord, transpose)}
         />{/if}
     {/each}
   {:else}
