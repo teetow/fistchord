@@ -1,30 +1,29 @@
 <script lang="ts">
-  import { tick } from "svelte";
+  import { createEventDispatcher, tick } from "svelte";
 
   import type { Section } from "./lib/parse";
+  import LyricLine from "./LyricLine.svelte";
 
   const fontSizes = {
-    1: "1em",
-    2: "1.2em",
-    3: "1.5em",
-    4: "2.5em",
-    5: "3.5em",
+    1: 0.75,
+    2: 0.85,
+    3: 1.0,
+    4: 1.5,
+    5: 2.0,
   };
-
   export let fontSize = 3;
   export let showChords = true;
   export let lyrics: Section[] = [];
 
+  const zoomSpeed = 200;
+  let container: Element;
   let sectionPtr = 0;
-  let container;
+  let dispatch = createEventDispatcher();
 
-  const updateScroll = async () => {
-    if (!container) {
-      return;
-    }
+  const scrollToActive = async () => {
+    if (!container) return;
 
     await tick();
-
     const currentSection = container.querySelector(".active");
 
     if (currentSection) {
@@ -35,47 +34,43 @@
     }
   };
 
-  $: updateScroll(), [sectionPtr];
-  $: updateScroll(), [fontSize];
+  const delayedScroll = async (timeout) => setTimeout(scrollToActive, timeout);
 
-  const handleKeydown = (e: KeyboardEvent) => {
-    const el = e.target;
-    if (el instanceof Element) {
-      if (e.key === "Home") {
-        sectionPtr = 0;
-      }
-      if (e.key === "ArrowDown") {
-        sectionPtr = (sectionPtr + 1 + lyrics.length) % lyrics.length;
-      } else if (e.key === "ArrowUp") {
-        sectionPtr = (sectionPtr - 1 + lyrics.length) % lyrics.length;
-      }
-    }
+  $: scrollToActive(), [sectionPtr];
+  $: delayedScroll(zoomSpeed), [fontSize];
+
+  const keyBinds: Record<string, () => void> = {
+    Home: () => (sectionPtr = 0),
+    ArrowDown: () => (sectionPtr = (sectionPtr + 1 + lyrics.length) % lyrics.length),
+    ArrowUp: () => (sectionPtr = (sectionPtr - 1 + lyrics.length) % lyrics.length),
+    NumpadPlus: () => dispatch("fontsize", (fontSize + 1) % 5),
   };
+
+  const handleKeydown = (e: KeyboardEvent) => keyBinds[e.key]?.();
 </script>
 
 <div
   bind:this={container}
   id="lyrics"
   tabindex="0"
-  style={`font-size: ${fontSizes[fontSize]}`}
+  style:--fontSize={fontSizes[fontSize]}
+  style:--zoomspeed={zoomSpeed}
   on:keydown={handleKeydown}
 >
   <div class="filler" />
-  {#each Object.entries(lyrics) as [id, section]}
-    <div class="section" class:active={Number(id) === sectionPtr}>
+  {#each Object.entries(lyrics) as [id, section] (id)}
+    <div
+      class="section"
+      class:active={Number(id) === sectionPtr}
+      on:click={() => (sectionPtr = Number(id))}
+    >
       {#if section.title !== undefined}
         <h3 class="title">[{section.title}]</h3>
       {/if}
 
       {#if section.lines}
-        {#each Object.entries(section.lines) as [lineId, line]}
-          {#if showChords && line.chords !== undefined}
-            <pre class="chords">{line.chords}</pre>
-          {/if}
-
-          {#if line.lyrics !== undefined}
-            <p class="lyrics">{line.lyrics}</p>
-          {/if}
+        {#each section.lines as line}
+          <LyricLine {showChords} {line} />
         {/each}
       {/if}
     </div>
@@ -87,12 +82,15 @@
 <style>
   #lyrics {
     background-color: rgb(238, 238, 238);
+    cursor: default;
     display: grid;
+    font-size: calc(var(--fontSize) * 1.5vw);
     gap: 1em;
+    overflow-x: hidden;
     overflow-y: hidden;
     padding: 2rem;
     scroll-behavior: smooth;
-    transition: font-size 200ms ease-in-out;
+    transition: font-size calc(var(--zoomspeed) * 1ms) linear;
   }
 
   #lyrics:focus {
@@ -100,8 +98,8 @@
   }
 
   #lyrics:not(:focus) {
-    background-color: #0003;
-    opacity: 0.9;
+    /* background-color: #0003; */
+    opacity: 1.0;
   }
 
   .filler {
@@ -117,9 +115,9 @@
     position: relative;
   }
 
-  .section.active:after {
-    content: "▶";
+  #lyrics:focus .section.active:after {
     color: red;
+    content: "▶";
     position: absolute;
     top: calc(50% - 0.2em);
     transform: translate(-1em, 0em);
@@ -129,14 +127,5 @@
     line-height: 2em;
     margin: 0 0 1em;
     font-weight: 400;
-  }
-
-  .chords {
-    margin: -0.7em 0 0 0;
-    font-size: 0.8em;
-  }
-
-  .lyrics {
-    margin: 0 0 1.2em;
   }
 </style>

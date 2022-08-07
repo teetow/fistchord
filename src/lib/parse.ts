@@ -18,7 +18,7 @@ type SectionMatch = {
   };
 };
 
-type Line = {
+export type Line = {
   chords?: string;
   lyrics?: string;
 };

@@ -1,0 +1,29 @@
+[Intro]
+
+A line without chords
+
+[Verse 1]
+
+Am
+A line with a starting Am chord
+
+                     Bm
+A line ending with a Bm
+
+                                   Cm
+A line with a Cm exactly at the end
+
+D                                     Em
+A line with a starting D chord and an Em in the middle
+
+                    F
+A line with only an F in the middle
+
+              G                           Am
+A line with a G in the middle and also an Am in the latter middle
+
+Bm                           C                     Dm
+A line starting with a Bm, a C in the middle and a Dm at the end
+
+                                                   Em
+A line with an Em far outside the end

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import testLyric from "./data/testlyrics3.txt?raw";
+  import testLyric from "./data/testlyrics4.txt?raw";
   import parse from "./lib/parse";
   import Lyrics from "./Lyrics.svelte";
   import Sidebar from "./Sidebar.svelte";
@@ -75,7 +75,7 @@
   {fontSize}
   on:fontsize={(e) => (fontSize = e.detail)}
 />
-<Lyrics {fontSize} {lyrics} {showChords} />
+<Lyrics {fontSize} {showChords} {lyrics} />
 
 <style>
 </style>

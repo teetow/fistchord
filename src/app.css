@@ -18,8 +18,9 @@ body {
 #app {
   display: grid;
   grid-template-areas: "side lyrics";
-  grid-template-columns: 300px auto;
+  grid-template-columns: 300px 1fr;
   height: 100%;
+  overflow: hidden;
 }
 
 h1,
