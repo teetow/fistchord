@@ -10,7 +10,7 @@ export class Linereader {
   }
 
   public get eof() {
-    return this._ctr >= this._max;
+    return this._ctr > this._max;
   }
 
   public get nextLine() {
@@ -39,7 +39,9 @@ export class Linereader {
   }
 
   readAll(): string[] {
-    return this.read(this._max - this._ctr);
+    const lines = this._lines.slice(this._ctr);
+    this._ctr = this._max;
+    return lines;
   }
 
   readUntilTrue(comparator: (line: string) => boolean): string | string[] | undefined {
