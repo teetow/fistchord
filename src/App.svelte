@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import testLyric from "./data/testlyrics4.txt?raw";
+  import testLyric from "./data/testlyrics.txt?raw";
   import parse from "./lib/parse";
   import Lyrics from "./Lyrics.svelte";
   import Sidebar from "./Sidebar.svelte";
@@ -9,7 +8,6 @@
 
   let fontSize = 3;
 
-  let sel = 0;
   let transpose = 0;
   let showChords = true;
 </script>
